@@ -1,5 +1,15 @@
 module EmpiricalBayes
 
-# package code goes here
+using Distributions
+using NLopt
 
-end # module
+include("model.jl")
+include("optim.jl")
+include("calculations.jl")
+
+
+export LikelihoodModel
+export npmle, mple, refprior
+
+
+end

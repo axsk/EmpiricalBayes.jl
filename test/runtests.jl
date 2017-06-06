@@ -1,5 +1,11 @@
 using EmpiricalBayes
-using Base.Test
+using Distributions
 
-# write your own tests here
-@test 1 == 2
+m=LikelihoodModel(xs=collect(linspace(0,1,10)), phi=(x->x), measerr=Normal(0,.1), ndata=5, prior=Uniform(0,1), zmult = 10)
+
+npmle(m)
+refprior(m)
+mple(m, 0.5)
+#em(m, 1000)
+
+# plots
