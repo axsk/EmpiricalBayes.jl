@@ -103,7 +103,48 @@ function jump(m,reg)
     JuMP.register(jm, :obj, n, (x...)->f(x), (g,x...)->(g[:] = df(x)))
 
     @constraint(jm, sum(x) == 1)
-    @NLobjective(jm, Max, obj(x))
+    @eval @NLobjective($jm, Max, $(Expr(:call, :obj, [Expr(:ref,:x, i) for i=1:n]...)))
 
     solve(jm)
+end
+
+using MathProgBase
+
+type StochasticProblem <: MathProgBase.AbstractNLPEvaluator
+    n
+    f
+    df
+end
+
+SP  = StochasticProblem
+MPB = MathProgBase
+
+# initialization
+MPB.initialize(d::SP, rf) = ()
+MPB.features_available(d::SP) = [:Grad, :Jac]
+
+# f
+MPB.eval_f(d::SP, x) = d.f(x)
+MPB.eval_grad_f(d::SP, g, x) = g[:]=d.df(x)
+
+# constraints
+MPB.eval_g(d::SP, g, x) = g[1]=sum(x)
+MPB.jac_structure(d::SP) = ones(Int,d.n), collect(1:d.n)
+MPB.eval_jac_g(d::SP, J, x) = J[:]=ones(Int, d.n)
+
+
+MPB.isobjlinear(d::SP) = false
+MPB.isobjquadratic(d::SP) = false
+MPB.isconstrlinear(d::SP) = true
+
+using Ipopt
+
+function mpb(m, reg)
+    nlm = MPB.NonlinearModel(IpoptSolver())
+    n = length(m.xs)
+    sp = SP(n, mple_obj(m,reg), dmple_obj(m,reg))
+    MPB.loadproblem!(nlm, n, 1, fill(0, n), fill(1, n), [1], [1], :Max, sp)
+    MPB.setwarmstart!(nlm, uniformweights(n))
+    MPB.optimize!(nlm)
+    @show MathProgBase.status(nlm)
 end

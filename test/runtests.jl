@@ -7,7 +7,8 @@ npmle(m)
 refprior(m)
 @time mple(m, 0.5)
 @time mple(m, 0.5, config=OptConfig(METHOD=:auglag))
-#em(m, 1000)
-@time EmpiricalBayes.jump(m, 0.5)
+@time EmpiricalBayes.mpb(m, .5)
+#@time EmpiricalBayes.jump(m, 0.5)
 
+#em(m, 1000)
 # plots
