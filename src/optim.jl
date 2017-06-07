@@ -90,3 +90,20 @@ function mple(m, reg, w0=uniformweights(m); config=OptConfig())
 
     minx
 end
+
+using JuMP
+function jump(m,reg)
+    n = length(m.xs)
+    jm=Model()
+    @variable(jm, 0 <= x[1:n] <= 1)
+
+    f  = mple_obj(m,reg)
+    df = dmple_obj(m,reg)
+
+    JuMP.register(jm, :obj, n, (x...)->f(x), (g,x...)->(g[:] = df(x)))
+
+    @constraint(jm, sum(x) == 1)
+    @NLobjective(jm, Max, obj(x))
+
+    solve(jm)
+end
