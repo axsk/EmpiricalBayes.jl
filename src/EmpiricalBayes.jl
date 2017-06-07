@@ -10,6 +10,7 @@ include("calculations.jl")
 
 export LikelihoodModel
 export npmle, mple, refprior
+export OptConfig
 
 
 end

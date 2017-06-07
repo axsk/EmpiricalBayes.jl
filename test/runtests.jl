@@ -5,7 +5,8 @@ m=LikelihoodModel(xs=collect(linspace(0,1,10)), phi=(x->x), measerr=Normal(0,.1)
 
 npmle(m)
 refprior(m)
-mple(m, 0.5)
+@time mple(m, 0.5)
+@time mple(m, 0.5, config=OptConfig(METHOD=:auglag))
 #em(m, 1000)
 
 # plots
