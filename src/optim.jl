@@ -90,7 +90,7 @@ function mple(m, reg, w0=uniformweights(m); config=OptConfig())
 
     minx
 end
-
+#=
 using JuMP
 function jump(m,reg)
     n = length(m.xs)
@@ -107,6 +107,7 @@ function jump(m,reg)
 
     solve(jm)
 end
+=#
 
 using MathProgBase
 
